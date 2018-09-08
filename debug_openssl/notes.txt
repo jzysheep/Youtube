@@ -1,0 +1,28 @@
+git clone https://github.com/openssl/openssl.git
+git tag -l
+git checkout OpenSSL_1_0_2g
+./config --prefix=/usr/local/ssl --openssldir=/usr/local/ssl -d shared no-asm no-ssl2 -g3 -ggdb -gdwarf-4 -fno-inline -O0 -fno-omit-frame-pointer
+
+--prefix and --openssldir control the configuration of installed components
+-d: Debug build of the library
+share: Build a shared object in addition to the static archive
+no-asm: Disables assembly language routines (and uses C routines)
+no-ssl2: Disables SSLv2
+no-ssl3: Disables SSLv3
+-g3: Include extra debug information. Some debuggers support macro expansions when you use -g3
+-ggdb3: Use most expressive format available to produce debugging information
+-gdwarf-4: Produce debugging information in DWARF format (if that is supported). For more information, visit: debuggingwith attributedrecord formats
+-fno-inline: Do not expand any functions inline apart from those marked with "always_inline" attribute
+-O0: Reduce compilation time and make debugging produce the expected results
+-fno-omit-frame-pointer: Omitting it makes debugging impossible on some machines (Recommended by official OpenSSL)
+
+make
+make test
+sudo make install
+
+export LD_LIBRARY_PATH=/usr/local/ssl/lib:$LD_LIBRARY_PATH
+gcc -I/usr/local/ssl/include/openssl -ggdb3 -O0 -o encrypt_decrypt_example example.c -lcrypto -lssl
+ldd encrypt_decrypt_example
+
+gdb encrypt_decrypt_example
+b example.c:35
